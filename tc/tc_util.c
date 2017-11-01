@@ -322,6 +322,66 @@ char *sprint_ticks(__u32 ticks, char *buf)
 	return sprint_time(tc_core_tick2time(ticks), buf);
 }
 
+/* 64 bit times are represented internally in nanoseconds */
+
+#define USEC_PER_SEC 1000
+#define MSEC_PER_SEC (1000 * 1000)
+#define NSEC_PER_SEC (MSEC_PER_SEC * 1000)
+
+int get_time64(__u64 *time, const char *str)
+{
+	double t;
+	char *p;
+
+	t = strtod(str, &p);
+	if (p == str)
+		return -1;
+
+	if (*p) {
+		if (strcasecmp(p, "s") == 0 ||
+		    strcasecmp(p, "sec") == 0 ||
+		    strcasecmp(p, "secs") == 0)
+			t *= NSEC_PER_SEC;
+		else if (strcasecmp(p, "ms") == 0 ||
+			 strcasecmp(p, "msec") == 0 ||
+			 strcasecmp(p, "msecs") == 0)
+			t *= MSEC_PER_SEC;
+		else if (strcasecmp(p, "us") == 0 ||
+			 strcasecmp(p, "usec") == 0 ||
+			 strcasecmp(p, "usecs") == 0)
+			t *= USEC_PER_SEC;
+		else if (strcasecmp(p, "ns") == 0 ||
+			 strcasecmp(p, "nsec") == 0 ||
+			 strcasecmp(p, "nsecs") == 0)
+			t *= 1;
+		else
+			return -1;
+	}
+
+	*time = t;
+	return 0;
+}
+
+void print_time64(char *buf, int len, __u64 time)
+{
+	double tmp = time;
+
+	if (time >= NSEC_PER_SEC)
+		snprintf(buf, len, "%.3fs", tmp/NSEC_PER_SEC);
+	else if (time >= MSEC_PER_SEC)
+		snprintf(buf, len, "%.3fms", tmp/MSEC_PER_SEC);
+	else if (time >= USEC_PER_SEC)
+		snprintf(buf, len, "%.3fus", tmp/USEC_PER_SEC);
+	else
+		snprintf(buf, len, "%lldns", time);
+}
+
+char *sprint_time64(__u64 time, char *buf)
+{
+	print_time64(buf, SPRINT_BSIZE-1, time);
+	return buf;
+}
+
 int get_size(unsigned int *size, const char *str)
 {
 	double sz;
