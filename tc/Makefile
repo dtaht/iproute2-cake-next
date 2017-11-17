@@ -63,6 +63,7 @@ TCMODULES += em_meta.o
 TCMODULES += q_mqprio.o
 TCMODULES += q_codel.o
 TCMODULES += q_fq_codel.o
+TCMODULES += q_cake.o
 TCMODULES += q_fq.o
 TCMODULES += q_pie.o
 TCMODULES += q_hhf.o
