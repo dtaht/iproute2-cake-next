@@ -262,6 +262,23 @@ static int cake_parse_opt(struct qdisc_util *qu, int argc, char **argv,
 			 * stats output when the automatic compensation is active.
 			 */
 
+		} else if (strcmp(*argv, "total_overhead") == 0) {
+			/*
+			 * This is the overhead cake accounts for; added here so 
+			 * that cake's "tc -s qdisc" output can be directly pasted
+			 * into the tc command to instantate a new cake..
+			 */
+			NEXT_ARG();
+
+		} else if (strcmp(*argv, "hard_header_len") == 0) {
+			/*
+			 * This is the overhead the kernel automatically accounted
+			 * for; added here so that cake's "tc -s qdisc" output can 
+			 * be directly pasted into the tc command to instantiate a 
+			 * new cake..
+			 */
+			NEXT_ARG();
+
 		} else if (strcmp(*argv, "ethernet") == 0) {
 			/* ethernet pre-amble & interframe gap & FCS
 			 * you may need to add vlan tag */
@@ -540,6 +557,10 @@ static int cake_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
 		if (ethernet)
 			fprintf(f, "via-ethernet ");
 	}
+
+	// unconditially report the overhead and hard_header_len the overhead the kernel added automatically
+	fprintf(f, "total_overhead %d ", overhead);
+	fprintf(f, "hard_header_len %d ", ethernet);
 
 	if (mpu) {
 		fprintf(f, "mpu %d ", mpu);
