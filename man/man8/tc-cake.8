@@ -168,7 +168,7 @@ parameter above.  ATM uses fixed 53-byte cells, each of which can carry 48 bytes
 .PP
 .B ptm
 .br
-	Compensates for PTM encoding, which is normally found on VDSL2 links and uses a 64b/65b encoding scheme.
+	Compensates for PTM encoding, which is normally found on VDSL2 links and uses a 64b/65b encoding scheme. It is even more efficient to simply derate the specified shaper bandwidth by a factor of 64/65 or 0.984. See ITU G.992.3 Annex N and IEEE 802.3 Section 61.3 for details.
 .PP
 .B noatm
 .br
@@ -244,17 +244,29 @@ See also the Ethernet Correction Factors section below.
 
 .SS VDSL2 Overhead Keywords
 ATM was dropped from VDSL2 in favour of PTM, which is a much more straightforward framing scheme.
-Some ISPs retained PPPoE for compatibility with their existing back-end systems.
+Some ISPs retained PPPoE for compatibility with their existing back-end systems. 
 .PP
 .B pppoe-ptm
 .br
 	Equivalent to
-.B overhead 27 ptm
+.B overhead 30 ptm
+
+PPPoE: 2B PPP + 6B PPPoE + 
+.br
+ETHERNET: 6B dest MAC + 6B src MAC + 2B ethertype + 4B Frame Check Sequence +
+.br
+PTM: 1B Start of Frame (S) + 1B End of Frame (Ck) + 2B TC-CRC (PTM-FCS)
+.br
 .PP
 .B bridged-ptm
 .br
 	Equivalent to
-.B overhead 19 ptm
+.B overhead 22 ptm
+
+ETHERNET: 6B dest MAC + 6B src MAC + 2B ethertype + 4B Frame Check Sequence +
+.br
+PTM: 1B Start of Frame (S) + 1B End of Frame (Ck) + 2B TC-CRC (PTM-FCS)
+.br
 .PP
 See also the Ethernet Correction Factors section below.
 
@@ -280,7 +292,7 @@ This is specified to be an Ethernet frame including the CRC (aka FCS).
 .PP
 .B ether-vlan
 .br
-	Adds 4 bytes to the overhead compensation, accounting for a VLAN header appended to the Ethernet frame header.  NB: Some ISPs use one or even two of these within PPPoE; this keyword may be repeated as necessary to express this.
+	Adds 4 bytes to the overhead compensation, accounting for an IEEE 802.1Q VLAN header appended to the Ethernet frame header.  NB: Some ISPs use one or even two of these within PPPoE; this keyword may be repeated as necessary to express this.
 
 .SH ROUND TRIP TIME PARAMETERS
 Active Queue Management (AQM) consists of embedding congestion signals in the packet flow, which
@@ -292,6 +304,13 @@ Very short latencies require a very rapid AQM response to adequately control lat
 However, such a rapid response tends to impair throughput when the actual RTT is relatively long.
 CAKE allows specifying the RTT it assumes for tuning various parameters.  Actual RTTs within
 an order of magnitude of this will generally work well for both throughput and latency management.
+
+At the 'lan' setting and below, the time constants are similar in magnitude
+to the jitter in the Linux kernel itself, so congestion might be
+signalled prematurely. The flows will then become sparse and total
+throughput reduced, leaving little or no back-pressure for the fairness
+logic to work against. Use the "metro" setting for local lans unless you
+have a custom kernel.
 .PP
 .B rtt
 TIME
@@ -463,59 +482,112 @@ tuning, relative to the current shaper bandwidth and RTT settings.
 LIMIT
 .br
 	Limit the memory consumed by Cake to LIMIT bytes. Note that this does not
-translate directly to queue size, as there is some overhead in the data
+translate directly to queue size (so do not size this based on bandwidth delay product considerations, but rather on worst case acceptable memory consumption), as there is some overhead in the data
 structures containing the packets, especially for small packets.
 
 	By default, the limit is calculated based on the bandwidth and RTT settings.
 
 
 .SH EXAMPLES
-#tc qdisc add dev enp3s0 root cake bandwidth 30mbit
+#sudo tc qdisc delete root  dev eth0
 .br
-#tc -s qdisc show dev enp3s0
+#sudo tc qdisc add root dev eth0 cake bandwidth 9500Kbit pppoe-ptm ether-vlan
 .br
-qdisc cake 8001: root refcnt 2 bandwidth 30Mbit diffserv4 flows rtt 100.0ms raw
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-capacity estimate: 30Mbit
+#tc -s qdisc show dev eth0
 .br
-             Tin 0       Tin 1       Tin 2       Tin 3
+qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14  
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)  
+ backlog 0b 0p requeues 0  
+ memory used: 0b of 4Mb 
+ capacity estimate: 9500Kbit 
 .br
-  thresh      30Mbit   28125Kbit   22500Kbit    7500Kbit
+                 Bulk   Best Effort      Voice 
 .br
-  target       5.0ms       5.0ms       5.0ms       5.0ms
+  thresh     593744bit    9500Kbit    2375Kbit 
 .br
-interval     100.0ms     100.0ms     100.0ms     100.0ms
+  target        30.6ms       5.0ms       7.6ms 
 .br
-Pk-delay         0us         0us         0us         0us
+  interval     125.6ms     100.0ms     102.6ms 
 .br
-Av-delay         0us         0us         0us         0us
+  pk_delay         0us         0us         0us 
 .br
-Sp-delay         0us         0us         0us         0us
+  av_delay         0us         0us         0us 
 .br
-  pkts             0           0           0           0
+  sp_delay         0us         0us         0us 
 .br
-  bytes            0           0           0           0
+  pkts               0           0           0 
 .br
-way-inds           0           0           0           0
+  bytes              0           0           0 
 .br
-way-miss           0           0           0           0
+  way_inds           0           0           0 
 .br
-way-cols           0           0           0           0
+  way_miss           0           0           0 
 .br
-  drops            0           0           0           0
+  way_cols           0           0           0 
 .br
-  marks            0           0           0           0
+  drops              0           0           0 
 .br
-Sp-flows           0           0           0           0
+  marks              0           0           0 
 .br
-Bk-flows           0           0           0           0
+  ack_drop           0           0           0 
 .br
-last-len           0           0           0           0
+  sp_flows           0           0           0 
 .br
-max-len            0           0           0           0
+  bk_flows           0           0           0 
+.br
+  un_flows           0           0           0 
+.br
+  max_len            0           0           0 
 .br
 
+After some use:
+.br
+#tc -s qdisc show dev eth0
+
+qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14 
+ Sent 110769306 bytes 313857 pkt (dropped 18, overlimits 741791 requeues 0) 
+ backlog 0b 0p requeues 0 
+ memory used: 110488b of 4Mb
+ capacity estimate: 9500Kbit
+.br
+                 Bulk   Best Effort      Voice
+.br
+  thresh     593744bit    9500Kbit    2375Kbit
+.br
+  target        30.6ms       5.0ms       7.6ms
+.br
+  interval     125.6ms     100.0ms     102.6ms
+.br
+  pk_delay      16.0ms       545us        15us
+.br
+  av_delay       2.4ms       161us         3us
+.br
+  sp_delay        59us         1us         1us
+.br
+  pkts           32866      195815       85194
+.br
+  bytes        8132614    69517496    33122156
+.br
+  way_inds           0       29208           0
+.br
+  way_miss           7         173          17
+.br
+  way_cols           0           0           0
+.br
+  drops             10           7           1
+.br
+  marks            217         692         300
+.br
+  ack_drop           0           0           0
+.br
+  sp_flows           0           0           0
+.br
+  bk_flows           0           0           1
+.br
+  un_flows           0           0           0
+.br
+  max_len         3028        3012        3028
+.br
 
 .SH SEE ALSO
 .BR tc (8),
