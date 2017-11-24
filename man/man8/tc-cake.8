@@ -4,99 +4,116 @@ CAKE \- COMMON Applications Kept Enhanced (CAKE)
 .SH SYNOPSIS
 .B tc qdisc ... cake
 .br
-	[
-.B bandwidth RATE
-|
-.B unlimited
-|
-.B autorate_ingress
+[ 
+.BR bandwidth
+RATE | 
+.BR unlimited* 
+| 
+.BR autorate_ingress 
 ]
 .br
-	[
-.B rtt
-TIME |
-.B datacenter
+[ 
+.BR rtt
+TIME | 
+.BR datacentre 
+| 
+.BR lan 
+| 
+.BR metro 
+| 
+.BR regional 
 |
-.B lan
-|
-.B metro
-|
-.B regional
-|
-.B internet
-|
-.B oceanic
-|
-.B satellite
-|
-.B interplanetary
+.BR internet* 
+| 
+.BR oceanic 
+| 
+.BR satellite 
+| 
+.BR interplanetary 
 ]
 .br
-	[
-.B besteffort
+[ 
+.BR besteffort 
+| 
+.BR diffserv8 
+| 
+.BR diffserv4 
+| 
+.BR diffserv-llt 
 |
-.B squash
-|
-.B precedence
-|
-.B diffserv8
-|
-.B diffserv4
-|
-.B diffserv3
-|
-.B diffserv-llt
+.BR diffserv3* 
 ]
 .br
-	[
-.B flowblind
-|
-.B srchost
-|
-.B dsthost
-|
-.B hosts
-|
-.B flows
-|
-.B dual-srchost
-|
-.B dual-dsthost
-|
-.B triple-isolate
+[ 
+.BR flowblind 
+| 
+.BR srchost 
+| 
+.BR dsthost 
+| 
+.BR hosts 
+| 
+.BR flows 
+| 
+.BR dual-srchost 
+| 
+.BR dual-dsthost 
+| 
+.BR triple-isolate* 
 ]
 .br
-	[
-.B nat
-|
-.B nonat
+[ 
+.BR nat 
+| 
+.BR nonat* 
 ]
 .br
-	[
-.B ptm
-|
-.B atm
-|
-.B noatm
+[ 
+.BR wash 
+| 
+.BR nowash* 
 ]
 .br
-	[
-.B overhead BYTES
-|
-.B conservative
-|
-.B raw
+[ 
+.BR ack-filter 
+| 
+.BR ack-filter-aggressive 
+| 
+.BR no-ack-filter* 
 ]
 .br
-	[
-.B mpu
-BYTES
+[ 
+.BR memlimit 
+LIMIT ]
+.br
+[ 
+.BR ptm 
+| 
+.BR atm 
+| 
+.BR noatm* 
+] 
+.br
+[ 
+.BR overhead 
+N | 
+.BR conservative 
+| 
+.BR raw* 
 ]
 .br
-	[
-.B memlimit
-SIZE
+[ 
+.BR mpu 
+N ]
+.br
+[ 
+.BR ingress 
+| 
+.BR egress* 
 ]
+.br
+(* marks defaults)
+
 
 .SH DESCRIPTION
 CAKE (Common Applications Kept Enhanced) is a shaping queue discipline which uses both AQM and FQ.
