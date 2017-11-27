@@ -4,112 +4,112 @@ CAKE \- COMMON Applications Kept Enhanced (CAKE)
 .SH SYNOPSIS
 .B tc qdisc ... cake
 .br
-[ 
+[
 .BR bandwidth
-RATE | 
-.BR unlimited* 
-| 
-.BR autorate_ingress 
+RATE |
+.BR unlimited*
+|
+.BR autorate_ingress
 ]
 .br
-[ 
+[
 .BR rtt
-TIME | 
-.BR datacentre 
-| 
-.BR lan 
-| 
-.BR metro 
-| 
-.BR regional 
+TIME |
+.BR datacentre
 |
-.BR internet* 
-| 
-.BR oceanic 
-| 
-.BR satellite 
-| 
-.BR interplanetary 
-]
-.br
-[ 
-.BR besteffort 
-| 
-.BR diffserv8 
-| 
-.BR diffserv4 
-| 
-.BR diffserv-llt 
+.BR lan
 |
-.BR diffserv3* 
+.BR metro
+|
+.BR regional
+|
+.BR internet*
+|
+.BR oceanic
+|
+.BR satellite
+|
+.BR interplanetary
 ]
 .br
-[ 
-.BR flowblind 
-| 
-.BR srchost 
-| 
-.BR dsthost 
-| 
-.BR hosts 
-| 
-.BR flows 
-| 
-.BR dual-srchost 
-| 
-.BR dual-dsthost 
-| 
-.BR triple-isolate* 
+[
+.BR besteffort
+|
+.BR diffserv8
+|
+.BR diffserv4
+|
+.BR diffserv-llt
+|
+.BR diffserv3*
 ]
 .br
-[ 
-.BR nat 
-| 
-.BR nonat* 
+[
+.BR flowblind
+|
+.BR srchost
+|
+.BR dsthost
+|
+.BR hosts
+|
+.BR flows
+|
+.BR dual-srchost
+|
+.BR dual-dsthost
+|
+.BR triple-isolate*
 ]
 .br
-[ 
-.BR wash 
-| 
-.BR nowash* 
+[
+.BR nat
+|
+.BR nonat*
 ]
 .br
-[ 
-.BR ack-filter 
-| 
-.BR ack-filter-aggressive 
-| 
-.BR no-ack-filter* 
+[
+.BR wash
+|
+.BR nowash*
 ]
 .br
-[ 
-.BR memlimit 
+[
+.BR ack-filter
+|
+.BR ack-filter-aggressive
+|
+.BR no-ack-filter*
+]
+.br
+[
+.BR memlimit
 LIMIT ]
 .br
-[ 
-.BR ptm 
-| 
-.BR atm 
-| 
-.BR noatm* 
-] 
-.br
-[ 
-.BR overhead 
-N | 
-.BR conservative 
-| 
-.BR raw* 
+[
+.BR ptm
+|
+.BR atm
+|
+.BR noatm*
 ]
 .br
-[ 
-.BR mpu 
+[
+.BR overhead
+N |
+.BR conservative
+|
+.BR raw*
+]
+.br
+[
+.BR mpu
 N ]
 .br
-[ 
-.BR ingress 
-| 
-.BR egress* 
+[
+.BR ingress
+|
+.BR egress*
 ]
 .br
 (* marks defaults)
@@ -261,14 +261,14 @@ See also the Ethernet Correction Factors section below.
 
 .SS VDSL2 Overhead Keywords
 ATM was dropped from VDSL2 in favour of PTM, which is a much more straightforward framing scheme.
-Some ISPs retained PPPoE for compatibility with their existing back-end systems. 
+Some ISPs retained PPPoE for compatibility with their existing back-end systems.
 .PP
 .B pppoe-ptm
 .br
 	Equivalent to
 .B overhead 30 ptm
 
-PPPoE: 2B PPP + 6B PPPoE + 
+PPPoE: 2B PPP + 6B PPPoE +
 .br
 ETHERNET: 6B dest MAC + 6B src MAC + 2B ethertype + 4B Frame Check Sequence +
 .br
@@ -512,58 +512,58 @@ structures containing the packets, especially for small packets.
 .br
 #tc -s qdisc show dev eth0
 .br
-qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14  
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)  
- backlog 0b 0p requeues 0  
- memory used: 0b of 4Mb 
- capacity estimate: 9500Kbit 
+qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
+ backlog 0b 0p requeues 0
+ memory used: 0b of 4Mb
+ capacity estimate: 9500Kbit
 .br
-                 Bulk   Best Effort      Voice 
+                 Bulk   Best Effort      Voice
 .br
-  thresh     593744bit    9500Kbit    2375Kbit 
+  thresh     593744bit    9500Kbit    2375Kbit
 .br
-  target        30.6ms       5.0ms       7.6ms 
+  target        30.6ms       5.0ms       7.6ms
 .br
-  interval     125.6ms     100.0ms     102.6ms 
+  interval     125.6ms     100.0ms     102.6ms
 .br
-  pk_delay         0us         0us         0us 
+  pk_delay         0us         0us         0us
 .br
-  av_delay         0us         0us         0us 
+  av_delay         0us         0us         0us
 .br
-  sp_delay         0us         0us         0us 
+  sp_delay         0us         0us         0us
 .br
-  pkts               0           0           0 
+  pkts               0           0           0
 .br
-  bytes              0           0           0 
+  bytes              0           0           0
 .br
-  way_inds           0           0           0 
+  way_inds           0           0           0
 .br
-  way_miss           0           0           0 
+  way_miss           0           0           0
 .br
-  way_cols           0           0           0 
+  way_cols           0           0           0
 .br
-  drops              0           0           0 
+  drops              0           0           0
 .br
-  marks              0           0           0 
+  marks              0           0           0
 .br
-  ack_drop           0           0           0 
+  ack_drop           0           0           0
 .br
-  sp_flows           0           0           0 
+  sp_flows           0           0           0
 .br
-  bk_flows           0           0           0 
+  bk_flows           0           0           0
 .br
-  un_flows           0           0           0 
+  un_flows           0           0           0
 .br
-  max_len            0           0           0 
+  max_len            0           0           0
 .br
 
 After some use:
 .br
 #tc -s qdisc show dev eth0
 
-qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14 
- Sent 110769306 bytes 313857 pkt (dropped 18, overlimits 741791 requeues 0) 
- backlog 0b 0p requeues 0 
+qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14
+ Sent 110769306 bytes 313857 pkt (dropped 18, overlimits 741791 requeues 0)
+ backlog 0b 0p requeues 0
  memory used: 110488b of 4Mb
  capacity estimate: 9500Kbit
 .br
