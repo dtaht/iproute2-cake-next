@@ -241,20 +241,18 @@ static int cake_parse_opt(struct qdisc_util *qu, int argc, char **argv,
 		/* Typical VDSL2 framing schemes, both over PTM */
 		/* PTM has 64b/65b coding which absorbs some bandwidth */
 		} else if (strcmp(*argv, "pppoe-ptm") == 0) {
-			/* 
-			 * 2B PPP + 6B PPPoE + 6B dest MAC + 6B src MAC 
+			/* 2B PPP + 6B PPPoE + 6B dest MAC + 6B src MAC
 			 * + 2B ethertype + 4B Frame Check Sequence
-			 * + 1B Start of Frame (S) + 1B End of Frame (Ck) 
+			 * + 1B Start of Frame (S) + 1B End of Frame (Ck)
 			 * + 2B TC-CRC (PTM-FCS) = 30B
 			 */
 			atm = 2;
 			overhead += 30;
 			overhead_set = true;
 		} else if (strcmp(*argv, "bridged-ptm") == 0) {
-			/* 
-			 * 6B dest MAC + 6B src MAC + 2B ethertype 
+			/* 6B dest MAC + 6B src MAC + 2B ethertype
 			 * + 4B Frame Check Sequence
-			 * + 1B Start of Frame (S) + 1B End of Frame (Ck) 
+			 * + 1B Start of Frame (S) + 1B End of Frame (Ck)
 			 * + 2B TC-CRC (PTM-FCS) = 22B
 			 */
 			atm = 2;
@@ -271,23 +269,24 @@ static int cake_parse_opt(struct qdisc_util *qu, int argc, char **argv,
 			 * that automatically, and is thus ignored.
 			 *
 			 * It would be deleted entirely, but it appears in the
-			 * stats output when the automatic compensation is active.
+			 * stats output when the automatic compensation is
+			 * active.
 			 */
 
 		} else if (strcmp(*argv, "total_overhead") == 0) {
 			/*
-			 * This is the overhead cake accounts for; added here so 
-			 * that cake's "tc -s qdisc" output can be directly pasted
-			 * into the tc command to instantate a new cake..
+			 * This is the overhead cake accounts for; added here so
+			 * that cake's "tc -s qdisc" output can be directly
+			 * pasted into the tc command to instantate a new cake..
 			 */
 			NEXT_ARG();
 
 		} else if (strcmp(*argv, "hard_header_len") == 0) {
 			/*
-			 * This is the overhead the kernel automatically accounted
-			 * for; added here so that cake's "tc -s qdisc" output can 
-			 * be directly pasted into the tc command to instantiate a 
-			 * new cake..
+			 * This is the overhead the kernel automatically
+			 * accounted for; added here so that cake's "tc -s
+			 * qdisc" output can be directly pasted into the tc
+			 * command to instantiate a new cake..
 			 */
 			NEXT_ARG();
 
@@ -306,7 +305,7 @@ static int cake_parse_opt(struct qdisc_util *qu, int argc, char **argv,
 
 		/*
 		 * DOCSIS cable shapers account for Ethernet frame with FCS,
-		 * but not interframe gap nor preamble.
+		 * but not interframe gap or preamble.
 		 */
 		} else if (strcmp(*argv, "docsis") == 0) {
 			atm = 0;
@@ -568,13 +567,16 @@ static int cake_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
 
 		fprintf(f, "overhead %d ", overhead);
 
-		// This is actually the *amount* of automatic compensation, but we only report
-		// its presence as a boolean for now.
+		/* This is actually the *amount* of automatic compensation, but
+		 * we only report its presence as a boolean for now.
+		 */
 		if (ethernet)
 			fprintf(f, "via-ethernet ");
 	}
 
-	// unconditially report the overhead and hard_header_len the overhead the kernel added automatically
+	/* unconditionally report the overhead and hard_header_len overhead the
+	 * kernel added automatically
+	 */
 	fprintf(f, "total_overhead %d ", overhead);
 	fprintf(f, "hard_header_len %d ", ethernet);
 
@@ -589,7 +591,7 @@ static int cake_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
 }
 
 static int cake_print_xstats(struct qdisc_util *qu, FILE *f,
-				 struct rtattr *xstats)
+			     struct rtattr *xstats)
 {
 	/* fq_codel stats format borrowed */
 	struct tc_fq_codel_xstats *st;
