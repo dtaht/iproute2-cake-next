@@ -506,11 +506,11 @@ structures containing the packets, especially for small packets.
 
 
 .SH EXAMPLES
-#sudo tc qdisc delete root  dev eth0
+# tc qdisc delete root dev eth0
 .br
-#sudo tc qdisc add root dev eth0 cake bandwidth 9500Kbit pppoe-ptm ether-vlan
+# tc qdisc add root dev eth0 cake bandwidth 9500Kbit pppoe-ptm ether-vlan
 .br
-#tc -s qdisc show dev eth0
+# tc -s qdisc show dev eth0
 .br
 qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14
  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
@@ -559,7 +559,7 @@ qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 1
 
 After some use:
 .br
-#tc -s qdisc show dev eth0
+# tc -s qdisc show dev eth0
 
 qdisc cake 8007: root refcnt 6 bandwidth 9500Kbit diffserv3 triple-isolate rtt 100.0ms ptm overhead 34 via-ethernet total_overhead 34 hard_header_len 14
  Sent 110769306 bytes 313857 pkt (dropped 18, overlimits 741791 requeues 0)
