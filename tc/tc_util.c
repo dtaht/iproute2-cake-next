@@ -632,7 +632,7 @@ static int parse_action_control_slash_spaces(int *argc_p, char ***argv_p,
 {
 	int argc = *argc_p;
 	char **argv = *argv_p;
-	int result1, result2;
+	int result1 = -1, result2;
 	int *result_p = &result1;
 	int ok = 0;
 	int ret;
@@ -690,8 +690,7 @@ int parse_action_control_slash(int *argc_p, char ***argv_p,
 							 allow_num);
 	*p = 0;
 	if (action_a2n(*argv, &result1, allow_num)) {
-		if (p)
-			*p = '/';
+		*p = '/';
 		return -1;
 	}
 

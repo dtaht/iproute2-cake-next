@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "iproute_lwtunnel.h"
 #include "bpf_util.h"
+#include "ila_common.h"
 
 #include <linux/seg6.h>
 #include <linux/seg6_iptunnel.h>
@@ -279,32 +280,6 @@ static void print_encap_ip(FILE *fp, struct rtattr *encap)
 		fprintf(fp, "tos %d ", rta_getattr_u8(tb[LWTUNNEL_IP_TOS]));
 }
 
-static char *ila_csum_mode2name(__u8 csum_mode)
-{
-	switch (csum_mode) {
-	case ILA_CSUM_ADJUST_TRANSPORT:
-		return "adj-transport";
-	case ILA_CSUM_NEUTRAL_MAP:
-		return "neutral-map";
-	case ILA_CSUM_NO_ACTION:
-		return "no-action";
-	default:
-		return "unknown";
-	}
-}
-
-static int ila_csum_name2mode(char *name)
-{
-	if (strcmp(name, "adj-transport") == 0)
-		return ILA_CSUM_ADJUST_TRANSPORT;
-	else if (strcmp(name, "neutral-map") == 0)
-		return ILA_CSUM_NEUTRAL_MAP;
-	else if (strcmp(name, "no-action") == 0)
-		return ILA_CSUM_NO_ACTION;
-	else
-		return -1;
-}
-
 static void print_encap_ila(FILE *fp, struct rtattr *encap)
 {
 	struct rtattr *tb[ILA_ATTR_MAX+1];
@@ -321,7 +296,18 @@ static void print_encap_ila(FILE *fp, struct rtattr *encap)
 
 	if (tb[ILA_ATTR_CSUM_MODE])
 		fprintf(fp, " csum-mode %s ",
-			ila_csum_mode2name(rta_getattr_u8(tb[ILA_ATTR_CSUM_MODE])));
+			ila_csum_mode2name(rta_getattr_u8(
+						tb[ILA_ATTR_CSUM_MODE])));
+
+	if (tb[ILA_ATTR_IDENT_TYPE])
+		fprintf(fp, " ident-type %s ",
+			ila_ident_type2name(rta_getattr_u8(
+						tb[ILA_ATTR_IDENT_TYPE])));
+
+	if (tb[ILA_ATTR_HOOK_TYPE])
+		fprintf(fp, " hook-type %s ",
+			ila_hook_type2name(rta_getattr_u8(
+						tb[ILA_ATTR_HOOK_TYPE])));
 }
 
 static void print_encap_ip6(FILE *fp, struct rtattr *encap)
@@ -771,6 +757,34 @@ static int parse_encap_ila(struct rtattr *rta, size_t len,
 
 			rta_addattr8(rta, 1024, ILA_ATTR_CSUM_MODE,
 				     (__u8)csum_mode);
+
+			argc--; argv++;
+		} else if (strcmp(*argv, "ident-type") == 0) {
+			int ident_type;
+
+			NEXT_ARG();
+
+			ident_type = ila_ident_name2type(*argv);
+			if (ident_type < 0)
+				invarg("\"ident-type\" value is invalid\n",
+				       *argv);
+
+			rta_addattr8(rta, 1024, ILA_ATTR_IDENT_TYPE,
+				     (__u8)ident_type);
+
+			argc--; argv++;
+		} else if (strcmp(*argv, "hook-type") == 0) {
+			int hook_type;
+
+			NEXT_ARG();
+
+			hook_type = ila_hook_name2type(*argv);
+			if (hook_type < 0)
+				invarg("\"hook-type\" value is invalid\n",
+				       *argv);
+
+			rta_addattr8(rta, 1024, ILA_ATTR_HOOK_TYPE,
+				     (__u8)hook_type);
 
 			argc--; argv++;
 		} else {

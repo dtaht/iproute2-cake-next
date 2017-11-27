@@ -22,15 +22,16 @@
 #include "libgenl.h"
 #include "utils.h"
 #include "ip_common.h"
+#include "ila_common.h"
 
 static void usage(void)
 {
-	fprintf(stderr, "Usage: ip ila add loc_match LOCATOR_MATCH "
-		"loc LOCATOR [ dev DEV ]\n");
-	fprintf(stderr, "       ip ila del loc_match LOCATOR_MATCH "
-		"[ loc LOCATOR ] [ dev DEV ]\n");
-	fprintf(stderr, "       ip ila list\n");
-	fprintf(stderr, "\n");
+	fprintf(stderr,
+"Usage: ip ila add loc_match LOCATOR_MATCH loc LOCATOR [ dev DEV ] OPTIONS\n"
+"       ip ila del loc_match LOCATOR_MATCH [ loc LOCATOR ] [ dev DEV ]\n"
+"       ip ila list\n"
+"OPTIONS := [ csum-mode { adj-transport | neutral-map | neutral-map-auto | no-action } ]\n"
+"           [ ident-type { luid | use-format } ]\n");
 
 	exit(-1);
 }
@@ -79,7 +80,7 @@ static void print_ila_locid(FILE *fp, int attr, struct rtattr *tb[], int space)
 	int i;
 
 	if (tb[attr]) {
-		blen = print_addr64(rta_getattr_u32(tb[attr]),
+		blen = print_addr64(rta_getattr_u64(tb[attr]),
 				    abuf, sizeof(abuf));
 		fprintf(fp, "%s", abuf);
 	} else {
@@ -113,9 +114,26 @@ static int print_ila_mapping(const struct sockaddr_nl *who,
 	print_ila_locid(fp, ILA_ATTR_LOCATOR, tb, ADDR_BUF_SIZE);
 
 	if (tb[ILA_ATTR_IFINDEX])
-		fprintf(fp, "%s", ll_index_to_name(rta_getattr_u32(tb[ILA_ATTR_IFINDEX])));
+		fprintf(fp, "%-16s",
+			ll_index_to_name(rta_getattr_u32(
+						tb[ILA_ATTR_IFINDEX])));
+	else
+		fprintf(fp, "%-10s ", "-");
+
+	if (tb[ILA_ATTR_CSUM_MODE])
+		fprintf(fp, "%s",
+			ila_csum_mode2name(rta_getattr_u8(
+						tb[ILA_ATTR_CSUM_MODE])));
+	else
+		fprintf(fp, "%-10s ", "-");
+
+	if (tb[ILA_ATTR_IDENT_TYPE])
+		fprintf(fp, "%s",
+			ila_ident_type2name(rta_getattr_u8(
+						tb[ILA_ATTR_IDENT_TYPE])));
 	else
 		fprintf(fp, "-");
+
 	fprintf(fp, "\n");
 
 	return 0;
@@ -152,9 +170,13 @@ static int ila_parse_opt(int argc, char **argv, struct nlmsghdr *n,
 	__u64 locator = 0;
 	__u64 locator_match = 0;
 	int ifindex = 0;
+	int csum_mode = 0;
+	int ident_type = 0;
 	bool loc_set = false;
 	bool loc_match_set = false;
 	bool ifindex_set = false;
+	bool csum_mode_set = false;
+	bool ident_type_set = false;
 
 	while (argc > 0) {
 		if (!matches(*argv, "loc")) {
@@ -174,6 +196,26 @@ static int ila_parse_opt(int argc, char **argv, struct nlmsghdr *n,
 				return -1;
 			}
 			loc_match_set = true;
+		} else if (!matches(*argv, "csum-mode")) {
+			NEXT_ARG();
+
+			csum_mode = ila_csum_name2mode(*argv);
+			if (csum_mode < 0) {
+				fprintf(stderr, "Bad csum-mode: %s\n",
+					*argv);
+				return -1;
+			}
+			csum_mode_set = true;
+		} else if (!matches(*argv, "ident-type")) {
+			NEXT_ARG();
+
+			ident_type = ila_ident_name2type(*argv);
+			if (ident_type < 0) {
+				fprintf(stderr, "Bad ident-type: %s\n",
+					*argv);
+				return -1;
+			}
+			ident_type_set = true;
 		} else if (!matches(*argv, "dev")) {
 			NEXT_ARG();
 
@@ -210,6 +252,12 @@ static int ila_parse_opt(int argc, char **argv, struct nlmsghdr *n,
 
 	if (ifindex_set)
 		addattr32(n, 1024, ILA_ATTR_IFINDEX, ifindex);
+
+	if (csum_mode_set)
+		addattr8(n, 1024, ILA_ATTR_CSUM_MODE, csum_mode);
+
+	if (ident_type_set)
+		addattr8(n, 1024, ILA_ATTR_IDENT_TYPE, ident_type);
 
 	return 0;
 }
