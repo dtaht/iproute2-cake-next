@@ -547,6 +547,21 @@ packets, especially for small packets.
 	By default, the limit is calculated based on the bandwidth and RTT
 settings.
 
+.PP
+.B wash
+
+.br
+	Traffic entering your diffserv domain is frequently mis-marked in
+transit from the perspective of your network, and traffic exiting yours may be
+mis-marked from the perspective of the transiting provider.
+
+Apply the wash option to clear all extra diffserv (but not ECN bits), after
+priority queuing has taken place.
+
+If you are shaping inbound, and cannot trust the diffserv markings (as is the
+case for Comcast Cable, among others), it is best to use a single queue
+"besteffort" mode with wash.
+
 .SH EXAMPLES
 # tc qdisc delete root dev eth0
 .br
