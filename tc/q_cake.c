@@ -646,116 +646,116 @@ static int cake_print_xstats(struct qdisc_util *qu, FILE *f,
 
 		switch(stnc->tin_cnt) {
 		case 3:
-			fprintf(f, "                 Bulk   Best Effort      Voice\n");
+			fprintf(f, "                   Bulk  Best Effort        Voice\n");
 			break;
 
 		case 4:
-			fprintf(f, "                 Bulk   Best Effort      Video       Voice\n");
+			fprintf(f, "                   Bulk  Best Effort        Video        Voice\n");
 			break;
 
 		case 5:
-			fprintf(f, "              Low Loss  Best Effort   Low Delay       Bulk  Net Control\n");
+			fprintf(f, "               Low Loss  Best Effort    Low Delay         Bulk  Net Control\n");
 			break;
 
 		default:
 			fprintf(f, "          ");
 			for(i=0; i < stnc->tin_cnt; i++)
-				fprintf(f, "       Tin %u", i);
+				fprintf(f, "        Tin %u", i);
 			fprintf(f, "\n");
 		};
 
 		fprintf(f, "  thresh  ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_rate(stnc->threshold_rate[i], b1));
+			fprintf(f, " %12s", sprint_rate(stnc->threshold_rate[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  target  ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_time(stnc->target_us[i], b1));
+			fprintf(f, " %12s", sprint_time(stnc->target_us[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  interval");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_time(stnc->interval_us[i], b1));
+			fprintf(f, " %12s", sprint_time(stnc->interval_us[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  pk_delay");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_time(stnc->peak_delay_us[i], b1));
+			fprintf(f, " %12s", sprint_time(stnc->peak_delay_us[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  av_delay");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_time(stnc->avge_delay_us[i], b1));
+			fprintf(f, " %12s", sprint_time(stnc->avge_delay_us[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  sp_delay");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12s", sprint_time(stnc->base_delay_us[i], b1));
+			fprintf(f, " %12s", sprint_time(stnc->base_delay_us[i], b1));
 		fprintf(f, "\n");
 
 		fprintf(f, "  pkts    ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->sent[i].packets);
+			fprintf(f, " %12u", stnc->sent[i].packets);
 		fprintf(f, "\n");
 
 		fprintf(f, "  bytes   ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12llu", stnc->sent[i].bytes);
+			fprintf(f, " %12llu", stnc->sent[i].bytes);
 		fprintf(f, "\n");
 
 		fprintf(f, "  way_inds");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->way_indirect_hits[i]);
+			fprintf(f, " %12u", stnc->way_indirect_hits[i]);
 		fprintf(f, "\n");
 
 		fprintf(f, "  way_miss");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->way_misses[i]);
+			fprintf(f, " %12u", stnc->way_misses[i]);
 		fprintf(f, "\n");
 
 		fprintf(f, "  way_cols");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->way_collisions[i]);
+			fprintf(f, " %12u", stnc->way_collisions[i]);
 		fprintf(f, "\n");
 
 		fprintf(f, "  drops   ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->dropped[i].packets);
+			fprintf(f, " %12u", stnc->dropped[i].packets);
 		fprintf(f, "\n");
 
 		fprintf(f, "  marks   ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->ecn_marked[i].packets);
+			fprintf(f, " %12u", stnc->ecn_marked[i].packets);
 		fprintf(f, "\n");
 
 		if(stnc->version >= 5) {
 			fprintf(f, "  ack_drop");
 			for(i=0; i < stnc->tin_cnt; i++)
-				fprintf(f, "%12u", stnc->ack_drops[i].packets);
+				fprintf(f, " %12u", stnc->ack_drops[i].packets);
 			fprintf(f, "\n");
 		}
 
 		fprintf(f, "  sp_flows");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->sparse_flows[i]);
+			fprintf(f, " %12u", stnc->sparse_flows[i]);
 		fprintf(f, "\n");
 
 		fprintf(f, "  bk_flows");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->bulk_flows[i]);
+			fprintf(f, " %12u", stnc->bulk_flows[i]);
 		fprintf(f, "\n");
 
 		if(stnc->version >= 4) {
 			fprintf(f, "  un_flows");
 			for(i=0; i < stnc->tin_cnt; i++)
-				fprintf(f, "%12u", stnc->unresponse_flows[i]);
+				fprintf(f, " %12u", stnc->unresponse_flows[i]);
 			fprintf(f, "\n");
 		}
 
 		fprintf(f, "  max_len ");
 		for(i=0; i < stnc->tin_cnt; i++)
-			fprintf(f, "%12u", stnc->max_skblen[i]);
+			fprintf(f, " %12u", stnc->max_skblen[i]);
 		fprintf(f, "\n");
 	} else {
 		return -1;
